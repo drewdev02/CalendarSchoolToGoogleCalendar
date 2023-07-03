@@ -73,11 +73,15 @@ public class HoraUtil {
         try {
             var initialDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-            for (var i = 1; i <= 5; i++) {
+            IntStream.range(0, 5)
+                    .mapToObj(i -> initialDate.plusDays(i + 1))
+                    .map(date -> date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                    .forEach(dateList::add);
+            /*for (var i = 1; i <= 5; i++) {
                 var currentDate = initialDate.plusDays(i);
                 var formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                 dateList.add(formattedDate);
-            }
+            }*/
         } catch (Exception e) {
             // Manejar el error de análisis de fecha aquí
             log.error("Error al generar la lista de fechas: {}", e.getMessage());
@@ -98,6 +102,7 @@ public class HoraUtil {
     public static void main(String[] args) {
         var fechas = generateDateList("18/06/2023");
         System.out.println(fechas);
+
     }
 }
 

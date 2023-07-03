@@ -3,15 +3,16 @@ package excel.services.impl;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import excel.services.IDataExtractor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import model.Hora;
+import model.TimeSlot;
 import org.jetbrains.annotations.NotNull;
 import util.HoraUtil;
 
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -21,13 +22,14 @@ import java.util.stream.IntStream;
 @Builder
 @AllArgsConstructor
 public class EventMapper {
-    private DataExtractor dataExtractor;
+    private IDataExtractor dataExtractor;
 
     private List<String> extractDataBelowCell(String cellReference) {
         return dataExtractor.extractDataBelowCell(cellReference);
     }
 
-    public List<Hora> parseTimeData(@NotNull List<String> timeData) {
+    @SneakyThrows
+    public List<TimeSlot> parseTimeData(@NotNull List<String> timeData) {
         return timeData.stream()
                 .filter(str -> !str.equalsIgnoreCase("null"))
                 .map(srt -> {
@@ -35,17 +37,13 @@ public class EventMapper {
                     var start = parts[0].trim();
                     var end = parts[1].trim();
 
-                    try {
-                        var startTime = new DateTime(HoraUtil.convertToRFC3339(start, "jj"));
-                        var endTime = new DateTime(HoraUtil.convertToRFC3339(end, ""));
-                        return Hora.builder()
-                                .start(startTime)
-                                .end(endTime)
-                                .build();
-                    } catch (DateTimeParseException e) {
-                        log.error("Error parsing time: {}", e.getMessage());
-                        return null;
-                    }
+                    var startTime = new DateTime(HoraUtil.convertToRFC3339(start, "jj"));
+                    var endTime = new DateTime(HoraUtil.convertToRFC3339(end, ""));
+                    return TimeSlot.builder()
+                            .start(startTime)
+                            .end(endTime)
+                            .build();
+
                 })
                 .filter(Objects::nonNull)
                 .toList();

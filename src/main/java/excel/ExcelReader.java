@@ -8,10 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import util.HoraUtil;
+import model.Subject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Data
@@ -20,32 +22,24 @@ import java.util.List;
 public class ExcelReader {
     private IDataExtractor dataExtractor;
 
-    public static <T> List<T> interleaveLists(List<T> list1, List<T> list2) {
-        List<T> result = new ArrayList<>();
-
-        int size = Math.max(list1.size(), list2.size());
-
-        for (int i = 0; i < size; i++) {
-            if (i < list1.size()) {
-                result.add(list1.get(i));
-            }
-            if (i < list2.size()) {
-                result.add(list2.get(i));
-            }
-        }
-
-        return result;
-    }
-
-    public void readExcel() {
-        var sheetNames = dataExtractor.getAllSheetNames();
-        log.info("Sheet names: {}", sheetNames);
-
-        var sheet = dataExtractor.getSheetByName(sheetNames.get(3));
-        log.info("Sheet: {}", sheet);
-
-        var data = dataExtractor.extractDataBelowCell("C21");
-        log.info("Data: {}", data);
+    public List<Subject> mapToListOfSubjects(@NotNull List<String> list, String day) {
+        var listSubjet = new ArrayList<String>();
+        var listLocation = new ArrayList<String>();
+        IntStream.range(0, list.size() / 2)
+                .forEach(i -> {
+                    if (i % 2 == 0) {
+                        listSubjet.add(list.get(i));
+                    } else {
+                        listLocation.add(list.get(i));
+                    }
+                });
+        return IntStream.range(0, listSubjet.size())
+                .mapToObj(i -> Subject.builder()
+                        .day(day)
+                        .name(listSubjet.get(i))
+                        .location(listLocation.get(i))
+                        .build())
+                .toList();
     }
 
     public static void main(String[] args) {
@@ -55,23 +49,22 @@ public class ExcelReader {
                         .build()
                 )
                 .build();
+        var day = excelReader.getDataExtractor().extractDataFromCell("D21");
 
-        var data = excelReader.getDataExtractor().extractDataBelowCell("C21");
-        var datamod = data.stream().filter(s -> !s.equalsIgnoreCase("null"))
-                .map(s -> s.split("-")[0].trim())
+        var time = excelReader.getDataExtractor()
+                .extractDataBelowCell("C21")
+                .stream()
+                .filter(s -> !s.equals("null"))
                 .toList();
-        var datamod2 = data.stream().filter(s -> !s.equalsIgnoreCase("null"))
-                .map(s -> s.split("-")[1].trim())
-                .toList();
-        //unit datamod y datamod2 intercalando elementos uno de datamod y otro de datamod2
-        var datamod3 = interleaveLists(datamod, datamod2);
 
+        var data = excelReader.getDataExtractor()
+                .extractDataBelowCell("D21");
 
-        var lista = HoraUtil.algo("22/06/2023", datamod3);
+        var sub = excelReader.mapToListOfSubjects(data, day);
+
+        System.out.println(time);
         System.out.println(data);
-        System.out.println(datamod);
-        System.out.println(lista);
-        System.out.println(datamod3);
+        System.out.println(sub);
 
     }
 

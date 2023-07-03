@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
@@ -47,6 +48,37 @@ public class DataExtractor implements IDataExtractor {
         return workbook.getSheet(sheetName);
     }
 
+    private String getCellAsString(Cell cell) {
+        if (cell != null) {
+            switch (cell.getCellType()) {
+                case STRING -> {
+                    return cell.getStringCellValue();
+                }
+                case NUMERIC -> {
+                    return String.valueOf(cell.getNumericCellValue());
+                }
+                case BOOLEAN -> {
+                    return String.valueOf(cell.getBooleanCellValue());
+                }
+                case FORMULA -> {
+                    return cell.getCellFormula();
+                }
+                case BLANK -> {
+                    return "null";
+                }
+                case ERROR -> {
+                    return "Error en la celda";
+                }
+                default -> {
+                    log.warn("Unsupported cell type: {}", cell.getCellType());
+                    return "";
+                }
+            }
+        } else {
+            return "";
+        }
+    }
+
     @Override
     public List<String> extractDataBelowCell(String cellReference) {
         Validation.validateNotBlank(cellReference, "Cell reference cannot be blank");
@@ -68,36 +100,26 @@ public class DataExtractor implements IDataExtractor {
                     log.debug("Processing row: {}", row.getRowNum());
                 })
                 .map(row -> row.getCell(columnNum))
-                .map(currentCell -> {
-                    if (currentCell != null) {
-                        switch (currentCell.getCellType()) {
-                            case STRING -> {
-                                return currentCell.getStringCellValue();
-                            }
-                            case NUMERIC -> {
-                                return String.valueOf(currentCell.getNumericCellValue());
-                            }
-                            case BOOLEAN -> {
-                                return String.valueOf(currentCell.getBooleanCellValue());
-                            }
-                            case FORMULA -> {
-                                return currentCell.getCellFormula();
-                            }
-                            case BLANK -> {
-                                return "null";
-                            }
-                            case ERROR -> {
-                                return "Error en la celda";
-                            }
-                            default -> {
-                                log.warn("Unsupported cell type: {}", currentCell.getCellType());
-                                return "";
-                            }
-                        }
-                    } else {
-                        return "";
-                    }
-                })
+                .map(this::getCellAsString)
                 .toList();
     }
+
+    @Override
+    public String extractDataFromCell(String cellReference) {
+        Validation.validateNotBlank(cellReference, "Cell reference cannot be blank");
+
+        var reference = new CellReference(cellReference);
+        var sheetNames = getAllSheetNames();
+        Validation.validateIndexInRange(3, sheetNames.size(), "Invalid sheet index");
+
+        var sheet = getSheetByName(sheetNames.get(3));
+
+        var row = reference.getRow();
+        var column = reference.getCol();
+
+        var cell = sheet.getRow(row).getCell(column);
+        log.debug("Extracting data from cell: {}", cellReference);
+        return getCellAsString(cell);
+    }
+
 }

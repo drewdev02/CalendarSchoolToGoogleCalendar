@@ -30,9 +30,6 @@ public class GoogleAuthorizationFlow implements AuthorizationFlow {
     private final List<String> SCOPES =
             Collections.singletonList(CalendarScopes.CALENDAR);
 
-    public GoogleAuthorizationFlow GoogleAuthorizationFlow() {
-        return this;
-    }
 
     @Override
     public Credential getCredentials(NetHttpTransport HTTP_TRANSPORT) throws IOException {

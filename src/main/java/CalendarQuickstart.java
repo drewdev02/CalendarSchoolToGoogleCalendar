@@ -3,11 +3,9 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import googlecalendar.services.impl.GoogleCalendarServiceBuilder;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
 public class CalendarQuickstart {
-    public static void main(String... args) throws IOException, GeneralSecurityException {
+
+    public static void main(String... args) {
         // Build a new authorized API client service.
         var calendar = new GoogleCalendarServiceBuilder()
                 .withAuthorizationFlow()
