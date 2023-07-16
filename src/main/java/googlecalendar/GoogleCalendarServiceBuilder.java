@@ -1,14 +1,15 @@
-package googlecalendar.services.impl;
+package googlecalendar;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import googlecalendar.services.AuthorizationFlow;
 import googlecalendar.services.CalendarService;
+import googlecalendar.services.impl.GoogleAuthorizationFlow;
+import googlecalendar.services.impl.GoogleCalendarService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-
 public class GoogleCalendarServiceBuilder {
     private AuthorizationFlow authorizationFlow;
     private NetHttpTransport httpTransport;

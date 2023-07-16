@@ -40,7 +40,7 @@
             <version>5.2.2</version>
         </dependency>
 
-        <!-- dependencias de google clinet -->
+        <!-- dependencias de google client -->
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>

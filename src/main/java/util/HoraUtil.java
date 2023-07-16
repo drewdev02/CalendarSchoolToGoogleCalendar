@@ -1,108 +1,62 @@
 package util;
 
+import com.google.api.client.util.DateTime;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.stream.IntStream;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class HoraUtil {
+
+    private static final String DATE_FORMAT = "dd/MM/yyyy";
+
+    private static final String TIME_FORMAT = "HH:mm";
+
     private HoraUtil() {
     }
 
-    public static @Nullable String convertToRFC3339(String dateString, String timeString) {
+    public static String convertToRFC3339(String dateString, String timeString) {
         try {
-            var date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            var formattedTime = convertToTwoDigitFormat(timeString);
-            var time = LocalTime.parse(formattedTime, DateTimeFormatter.ofPattern("HH:mm"));
-            var dateTime = date.atTime(time);
-            var zoneOffset = ZoneOffset.UTC; // Especificamos la zona horaria como UTC
-            var offsetDateTime = OffsetDateTime.of(dateTime, zoneOffset);
-            return offsetDateTime.toInstant().toString();
+            LocalDate date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(DATE_FORMAT));
+            String formattedTime = convertToTwoDigitFormat(timeString);
+            LocalTime time = LocalTime.parse(formattedTime, DateTimeFormatter.ofPattern(TIME_FORMAT));
+            LocalDateTime dateTime = date.atTime(time);
+            ZoneId zone = ZoneId.of("America/Havana"); // Zona Horaria de Cuba (CST)
+            ZonedDateTime zonedDateTime = ZonedDateTime.of(dateTime, zone);
+            return zonedDateTime.toInstant().toString();
         } catch (DateTimeParseException e) {
-            // Manejar el error de análisis de fecha o hora aquí
-            log.error("Error al convertir a formato RFC3339: {}", e.getMessage());
+            // Manejar el error
+            System.out.println("Error al convertir a formato RFC3339: " + e.getMessage());
             return null;
         }
-    }
-
-    public static List<String> algo(String dateString, List<String> timeStrings, BiFunction<String, String, String> function) {
-        return timeStrings.stream()
-                .map(timeString -> function.apply(dateString, timeString))
-                .filter(Objects::nonNull)
-                .toList();
-
-    }
-
-    public static BiFunction<String, String, String> convertToRFC3339() {
-        return HoraUtil::convertToRFC3339;
-    }
-
-    public static List<String> algo(String dateString, List<String> timeStrings) {
-        return timeStrings.stream()
-                .map(timeString -> convertToRFC3339(dateString, timeString))
-                .filter(Objects::nonNull)
-                .toList();
-
     }
 
     public static @Nullable String convertToTwoDigitFormat(String timeString) {
         try {
             var time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("H:mm"));
-            return time.format(DateTimeFormatter.ofPattern("HH:mm"));
+            return time.format(DateTimeFormatter.ofPattern(TIME_FORMAT));
         } catch (DateTimeParseException e) {
             log.error("Error al convertir a formato de dos dígitos: {}", e.getMessage());
             return null;
         }
     }
 
-    public static @NotNull List<String> generateDateList(String startDate) {
-        List<String> dateList = new ArrayList<>();
-
-        try {
-            var initialDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
-            IntStream.range(0, 5)
-                    .mapToObj(i -> initialDate.plusDays(i + 1))
-                    .map(date -> date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                    .forEach(dateList::add);
-            /*for (var i = 1; i <= 5; i++) {
-                var currentDate = initialDate.plusDays(i);
-                var formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                dateList.add(formattedDate);
-            }*/
-        } catch (Exception e) {
-            // Manejar el error de análisis de fecha aquí
-            log.error("Error al generar la lista de fechas: {}", e.getMessage());
+    public static String extractTime(DateTime dateTime) {
+        var timeString = dateTime.toString(); // Convertir el objeto DateTime a una cadena de texto
+        var pattern = "\\d{2}:\\d{2}"; // Expresión regular para buscar el formato "HH:mm"
+        var regex = Pattern.compile(pattern);
+        var matcher = regex.matcher(timeString);
+        if (matcher.find()) {
+            return matcher.group(); // Devolver la primera coincidencia encontrada
+        } else {
+            throw new IllegalArgumentException("No se pudo extraer la hora en formato HH:mm");
         }
-        return dateList;
     }
 
-    public static List<String> addTimeSuffix(List<String> strings) {
-        return IntStream.range(0, strings.size())
-                .mapToObj(i -> {
-                    var string = strings.get(i);
-                    var suffix = (i >= strings.size() - 5) ? "p.m" : "a.m";
-                    return string + " " + suffix;
-                })
-                .toList();
-    }
-
-    public static void main(String[] args) {
-        var fechas = generateDateList("18/06/2023");
-        System.out.println(fechas);
-
-    }
 }
 

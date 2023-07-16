@@ -23,6 +23,7 @@ public class DataExtractor implements IDataExtractor {
 
     private IExcelFileLoader fileLoader;
 
+    //TODO: cambiar y agregar como atributo
     private Workbook loadWorkbook() {
         return fileLoader.loadWorkbook();
     }

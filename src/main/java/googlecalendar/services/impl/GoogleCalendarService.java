@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,6 +42,18 @@ public class GoogleCalendarService implements CalendarService {
     public void createEvent(Event event) {
         service.events().insert("primary", event).execute();
         log.debug("Event created: {}", event);
+    }
+
+    @SneakyThrows
+    public void createEvents(List<Event> events) {
+        events.forEach(event -> {
+            try {
+                service.events().insert("primary", event).execute();
+                log.debug("Event created: {}", event);
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
     }
 
     @SneakyThrows
