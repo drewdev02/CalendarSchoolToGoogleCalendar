@@ -24,14 +24,13 @@ public class HoraUtil {
         try {
             LocalDate date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(DATE_FORMAT));
             String formattedTime = convertToTwoDigitFormat(timeString);
-            LocalTime time = LocalTime.parse(formattedTime, DateTimeFormatter.ofPattern(TIME_FORMAT));
+            LocalTime time = LocalTime.parse(Objects.requireNonNull(formattedTime), DateTimeFormatter.ofPattern(TIME_FORMAT));
             LocalDateTime dateTime = date.atTime(time);
             ZoneId zone = ZoneId.of("America/Havana"); // Zona Horaria de Cuba (CST)
             ZonedDateTime zonedDateTime = ZonedDateTime.of(dateTime, zone);
             return zonedDateTime.toInstant().toString();
         } catch (DateTimeParseException e) {
-            // Manejar el error
-            System.out.println("Error al convertir a formato RFC3339: " + e.getMessage());
+            log.error("Error al convertir a formato RFC3339: {}", e.getMessage());
             return null;
         }
     }
@@ -54,6 +53,7 @@ public class HoraUtil {
         if (matcher.find()) {
             return matcher.group(); // Devolver la primera coincidencia encontrada
         } else {
+            log.error("No se pudo extraer la hora en formato HH:mm");
             throw new IllegalArgumentException("No se pudo extraer la hora en formato HH:mm");
         }
     }

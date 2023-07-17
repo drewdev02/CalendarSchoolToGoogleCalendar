@@ -23,9 +23,13 @@ public class DataExtractor implements IDataExtractor {
 
     private IExcelFileLoader fileLoader;
 
-    //TODO: cambiar y agregar como atributo
+    private Workbook workbookInstance;
+
     private Workbook loadWorkbook() {
-        return fileLoader.loadWorkbook();
+        if (workbookInstance == null) {
+            workbookInstance = fileLoader.loadWorkbook();
+        }
+        return workbookInstance;
     }
 
     @Override
@@ -68,6 +72,7 @@ public class DataExtractor implements IDataExtractor {
                     return "null";
                 }
                 case ERROR -> {
+                    log.warn("Error en la celda");
                     return "Error en la celda";
                 }
                 default -> {

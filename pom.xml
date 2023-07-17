@@ -13,6 +13,7 @@
         <maven.compiler.target>20</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -59,18 +60,23 @@
             <version>v3-rev20220715-2.0.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.5</version>
-        </dependency>
-
+        <!-- Dependencias de Logback -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.4.7</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+
+        <!--   <dependency>
+               <groupId>com.github.janmat</groupId>
+               <artifactId>logback-ansi-color-plugin</artifactId>
+           </dependency>-->
 
     </dependencies>
 

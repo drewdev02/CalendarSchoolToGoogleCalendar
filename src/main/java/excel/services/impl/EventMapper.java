@@ -53,12 +53,11 @@ public class EventMapper implements IEventMapper {
     }
 
     public List<Event> mapToEventDataList(@NotNull List<Subject> subjects) {
-        return subjects.stream().map(
-                        subject -> new Event()
-                                .setSummary(subject.getName())
-                                .setLocation(subject.getLocation())
-                                .setStart(new EventDateTime().setDateTime(subject.getTimeSlot().getStart()))
-                                .setEnd(new EventDateTime().setDateTime(subject.getTimeSlot().getEnd())))
+        return subjects.stream().map(subject -> new Event()
+                        .setSummary(subject.getName())
+                        .setLocation(subject.getLocation())
+                        .setStart(new EventDateTime().setDateTime(subject.getTimeSlot().getStart()))
+                        .setEnd(new EventDateTime().setDateTime(subject.getTimeSlot().getEnd())))
                 .toList();
     }
 
@@ -104,7 +103,6 @@ public class EventMapper implements IEventMapper {
                             .build();
                 })
                 .toList();
-
 
     }
 }

@@ -28,13 +28,17 @@ public class ExcelReaderBuilder {
     }
 
     public ExcelReaderBuilder withDataExtractor() {
-        this.dataExtractor = new DataExtractor(fileLoader);
+        this.dataExtractor = DataExtractor.builder()
+                .fileLoader(fileLoader)
+                .build();
         log.debug("DataExtractor set");
         return this;
     }
 
     public ExcelReaderBuilder withEventMapper() {
-        this.eventMapper = new EventMapper(dataExtractor);
+        this.eventMapper = EventMapper.builder()
+                .dataExtractor(dataExtractor)
+                .build();
         log.debug("EventMapper set");
         return this;
     }
