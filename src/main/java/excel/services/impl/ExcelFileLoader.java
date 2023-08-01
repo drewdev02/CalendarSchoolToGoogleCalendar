@@ -12,7 +12,7 @@ import java.io.IOException;
 @Slf4j
 @NoArgsConstructor
 public class ExcelFileLoader implements IExcelFileLoader {
-    private static final String DATA_FILE_PATH = "data/Horario_FTE_CRD_190623-240623.xlsx";
+    public static final String DATA_FILE_PATH = "data/Horario_FTE_CRD_190623-240623.xlsx";
 
     @Override
     public Workbook loadWorkbook() {
@@ -20,8 +20,8 @@ public class ExcelFileLoader implements IExcelFileLoader {
             log.debug("Archivo cargado correctamente");
             return workbook;
         } catch (IOException e) {
-            log.error("Error while reading the Excel file.", e);
-            throw new RuntimeException("Error while reading the Excel file.", e);
+            log.error("Error while reading the Excel file. {}", e.getMessage());
+            throw new RuntimeException("Error while reading the Excel file.{}", e);
         }
     }
 }

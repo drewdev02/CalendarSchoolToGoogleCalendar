@@ -38,20 +38,26 @@ public class GoogleCalendarService implements CalendarService {
                 .build();
     }
 
-    @SneakyThrows
+
     public void createEvent(Event event) {
-        service.events().insert("primary", event).execute();
+        try {
+            service.events().insert("primary", event).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         log.debug("Event created: {}", event);
     }
 
-    @SneakyThrows
+
     public void createEvents(List<Event> events) {
         events.forEach(event -> {
-            try {
-                service.events().insert("primary", event).execute();
+            if (!event.getSummary().equals("null") && !event.getLocation().equals("null")) {
+                try {
+                    service.events().insert("primary", event).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage());
+                }
                 log.debug("Event created: {}", event);
-            } catch (IOException e) {
-                throw new RuntimeException(e.getMessage());
             }
         });
     }
