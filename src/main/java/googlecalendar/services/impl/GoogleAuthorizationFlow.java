@@ -36,11 +36,7 @@ public class GoogleAuthorizationFlow implements AuthorizationFlow {
         // Load client secrets.
         log.debug("Loading client secrets from file: {}", CREDENTIALS_FILE_PATH);
         var in = new FileInputStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
-        var clientSecrets =
-                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+        var clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
         log.debug("Building authorization flow");

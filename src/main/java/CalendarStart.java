@@ -2,7 +2,6 @@ import com.google.api.services.calendar.model.Event;
 import excel.ExcelReaderBuilder;
 import excel.services.IDataExtractor;
 import excel.services.IEventMapper;
-import excel.services.impl.EventMapper;
 import excel.services.impl.ExcelFileLoader;
 import googlecalendar.GoogleCalendarServiceBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -47,28 +46,28 @@ public class CalendarStart {
 
     public static void main(String[] args) {
         // Build a new authorized API client service.
-        var calendar = new GoogleCalendarServiceBuilder()
+        final var calendar = new GoogleCalendarServiceBuilder()
                 .withAuthorizationFlow()
                 .withHttpTransport()
                 .build();
 
-        var excel = new ExcelReaderBuilder()
+        final var excel = new ExcelReaderBuilder()
                 .withExcelFileLoader()
                 .withDataExtractor()
                 .withEventMapper()
                 .build();
 
-        var timeSlot = ExcelFileLoader.DATA_FILE_PATH.split("_")[3];
+        final var timeSlot = ExcelFileLoader.DATA_FILE_PATH.split("_")[3];
 
-        var inicio = timeSlot.split("-")[0];
+        final var inicio = timeSlot.split("-")[0];
 
-        var finalSemana = timeSlot.split("-")[1].split("\\.")[0];
+        final var finalSemana = timeSlot.split("-")[1].split("\\.")[0];
 
-        var mapper = excel.getEventMapper();
+        final var mapper = excel.getEventMapper();
 
-        var data = excel.getDataExtractor();
+        final var data = excel.getDataExtractor();
 
-        var semana = algo(data, mapper, inicio, finalSemana);
+        final var semana = algo(data, mapper, inicio, finalSemana);
 
 
         semana.forEach(calendar::createEvents);

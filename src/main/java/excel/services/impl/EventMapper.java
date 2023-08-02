@@ -60,9 +60,11 @@ public class EventMapper implements IEventMapper {
         }
     }
 
+    @Override
     public List<Event> mapToEventDataList(@NotNull List<Subject> subjects) {
         // Mapea cada objeto Subject a un objeto Event y los agrega a una lista
-        return subjects.stream().map(subject -> new Event()
+        return subjects.stream()
+                .map(subject -> new Event()
                         .setSummary(subject.getName()) // Establece el nombre del evento
                         .setLocation(subject.getLocation()) // Establece la ubicación del evento
                         .setStart(new EventDateTime()
@@ -72,6 +74,7 @@ public class EventMapper implements IEventMapper {
                 .toList(); // Convierte el flujo de eventos mapeados en una lista
     }
 
+    @Override
     public List<TimeSlot> getTimeSlots(String date) {
         // Extrae los datos de tiempo de las celdas debajo de la celda "C21"
         var timeString = extractDataBelowCell("C21");
@@ -80,17 +83,19 @@ public class EventMapper implements IEventMapper {
         return parseTimeData(timeString, date);
     }
 
+    @Override
     public List<Subject> mapToListOfSubjects(@NotNull List<String> list, List<TimeSlot> horas) {
         // Crear listas para almacenar los nombres de las asignaturas y las ubicaciones
         var listSubject = new ArrayList<String>();
         var listLocation = new ArrayList<String>();
 
         // Iterar sobre la lista de entrada y dividirla en nombres de asignaturas y ubicaciones
-        return IntStream.range(0, list.size() / 2)
-                .peek(i -> {
+        IntStream.range(0, list.size() / 2)
+                .forEach(i -> {
                     if (i % 2 == 0) listSubject.add(list.get(i));
                     else listLocation.add(list.get(i));
-                })
+                });
+        return IntStream.range(0, listSubject.size())
                 .mapToObj(i -> Subject.builder()// Mapear las listas de nombres de asignaturas y ubicaciones a objetos Subject
                         .numberClass(i + 1)
                         .name(listSubject.get(i))
@@ -100,6 +105,7 @@ public class EventMapper implements IEventMapper {
                 .toList();
     }
 
+    @Override
     public List<Subject> updateSubjectTimeSlots(@NotNull List<Subject> subjects, String date) {
         // Mapear cada objeto Subject de la lista subjects a un nuevo objeto Subject
         return subjects.stream()

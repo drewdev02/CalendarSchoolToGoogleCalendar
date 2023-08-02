@@ -13,6 +13,7 @@ import org.apache.poi.ss.util.CellReference;
 import util.Validation;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -79,11 +80,11 @@ public class DataExtractor implements IDataExtractor {
                     return "null";
                 }
                 case ERROR -> {
-                    log.warn("Error en la celda");
+                    log.error("Error en la celda");
                     return "Error en la celda";
                 }
                 default -> {
-                    log.warn("Unsupported cell type: {}", cell.getCellType());
+                    log.error("Unsupported cell type: {}", cell.getCellType());
                     return "";
                 }
             }
