@@ -90,7 +90,7 @@ public class EventMapper implements IEventMapper {
         var listLocation = new ArrayList<String>();
 
         // Iterar sobre la lista de entrada y dividirla en nombres de asignaturas y ubicaciones
-        IntStream.range(0, list.size() / 2)
+        IntStream.range(0, list.size())
                 .forEach(i -> {
                     if (i % 2 == 0) listSubject.add(list.get(i));
                     else listLocation.add(list.get(i));

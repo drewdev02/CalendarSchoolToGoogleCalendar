@@ -13,7 +13,6 @@ import org.apache.poi.ss.util.CellReference;
 import util.Validation;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -89,7 +88,7 @@ public class DataExtractor implements IDataExtractor {
                 }
             }
         } else {
-            log.warn("Cell is null: {}", cell.getCellType());
+            log.warn("Cell is null");
             return "Cell is null";
         }
     }

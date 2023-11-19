@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import util.Attendee;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -18,7 +19,8 @@ import java.util.List;
 @Data
 @Slf4j
 public class GoogleCalendarService implements CalendarService {
-    private final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
+    private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
+    private static final String CALENDAR_ID = "primary";
 
     private AuthorizationFlow authorizationFlow;
 
@@ -33,31 +35,39 @@ public class GoogleCalendarService implements CalendarService {
     @SneakyThrows
     private @NotNull Calendar buildCalendarService(NetHttpTransport httpTransport) {
         var credential = authorizationFlow.getCredentials(httpTransport);
+        var a = credential.getAccessToken();
+        if (a == null) {
+            credential.refreshToken();
+        }
         return new Calendar.Builder(httpTransport, credential.getJsonFactory(), credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
 
-
+    @SneakyThrows
     public void createEvent(Event event) {
-        try {
-            service.events().insert("primary", event).execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        log.debug("Event created: {}", event);
+        event.setAttendees(Attendee.getAttendees());//anadir invitado al evento
+
+        service.events()
+                .insert(CALENDAR_ID, event)
+                .execute();
+
+        log.debug("Event created: {}", event.getSummary());
     }
 
 
     public void createEvents(List<Event> events) {
         events.forEach(event -> {
-            if (!event.getSummary().equals("null") && !event.getLocation().equals("null")) {
+            if (!event.getSummary().equals("null")) {
                 try {
-                    service.events().insert("primary", event).execute();
+                    event.setAttendees(Attendee.getAttendees());//anadir invitado al evento
+                    service.events()
+                            .insert(CALENDAR_ID, event)
+                            .execute();
+                    log.debug("Event created: {}", event.getSummary());
                 } catch (IOException e) {
                     throw new RuntimeException(e.getMessage());
                 }
-                log.debug("Event created: {}", event);
             }
         });
     }
@@ -65,7 +75,7 @@ public class GoogleCalendarService implements CalendarService {
     @SneakyThrows
     public List<String> listNext10Events() {
         var now = new DateTime(System.currentTimeMillis());
-        var events = service.events().list("primary")
+        var events = service.events().list(CALENDAR_ID)
                 .setMaxResults(10)
                 .setTimeMin(now)
                 .setOrderBy("startTime")

@@ -15,7 +15,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,13 +26,11 @@ import java.util.List;
 @Slf4j
 @NoArgsConstructor
 public class GoogleAuthorizationFlow implements AuthorizationFlow {
-    private final String CREDENTIALS_FILE_PATH = "credentials.json";
-    private final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final String CREDENTIALS_FILE_PATH = "credentials.json";
+    private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
     private final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private final List<String> SCOPES =
-            Collections.singletonList(CalendarScopes.CALENDAR);
-
+    private final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
 
     @Override
     public Credential getCredentials(NetHttpTransport HTTP_TRANSPORT) throws IOException {
@@ -48,7 +49,9 @@ public class GoogleAuthorizationFlow implements AuthorizationFlow {
         var receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         // Returns an authorized Credential object.
         log.debug("Authorizing user");
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        var credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        credential.refreshToken();
+        return credential;
     }
 }
 

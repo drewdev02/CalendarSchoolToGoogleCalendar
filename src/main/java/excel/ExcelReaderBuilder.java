@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 public class ExcelReaderBuilder {
+
     private IExcelFileLoader fileLoader;
     private IDataExtractor dataExtractor;
     private IEventMapper eventMapper;

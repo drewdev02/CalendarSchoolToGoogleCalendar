@@ -1,7 +1,7 @@
 package excel.services.impl;
 
 import excel.services.IExcelFileLoader;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -13,13 +13,16 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Slf4j
-@NoArgsConstructor
+@Data
 public class ExcelFileLoader implements IExcelFileLoader {
-    public static final String DATA_FILE_PATH = "data/Horario_FTE_CRD_190623-240623.xlsx";
+    public static final String DATA_FILE_PATH = "data/Horario_FTE_CRD_201123-241123.xls";
+    //public static final String DATA_FILE_PATH = getAllFilesInFolder().get(0).getAbsolutePath();
 
     @Override
+    @SuppressWarnings("java:S112")
     public Workbook loadWorkbook() {
-        try (var workbook = WorkbookFactory.create(new File(DATA_FILE_PATH))) {
+        var file = new File(DATA_FILE_PATH);
+        try (var workbook = WorkbookFactory.create(file)) {
             log.debug("Archivo cargado correctamente");
             return workbook;
         } catch (IOException e) {
@@ -28,9 +31,9 @@ public class ExcelFileLoader implements IExcelFileLoader {
         }
     }
 
-    @Override
-    public List<File> getAllFilesInFolder(String folderPath) {
-        var folder = new File(folderPath);
+    public static List<File> getAllFilesInFolder() {
+        var FOLDER_PATH = "data/";
+        var folder = new File(FOLDER_PATH);
         if (folder.exists() && folder.isDirectory()) {
             return Stream.of(Objects.requireNonNull(folder.listFiles()))
                     .toList();

@@ -46,8 +46,14 @@ public class HoraUtil {
 
     public static @Nullable String convertToTwoDigitFormat(String timeString) {
         try {
-            final var time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("H:mm"));
-            return time.format(DateTimeFormatter.ofPattern(TIME_FORMAT));
+            var primerDijito = Integer.parseInt(timeString.split(":")[0]);
+            if (primerDijito >= 1 && primerDijito <= 5) {
+                //convertir en formato 24h
+                return convertTo24HourFormat(timeString);
+            } else {
+                final var time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("H:mm"));
+                return time.format(DateTimeFormatter.ofPattern(TIME_FORMAT));
+            }
         } catch (DateTimeParseException e) {
             log.error("Error al convertir a formato de dos dígitos: {}", e.getMessage());
             return null;
@@ -79,6 +85,7 @@ public class HoraUtil {
         }
     }
 
+    @SuppressWarnings("unused")
     public static @NotNull List<String> generateDateList(String startDate) {
         try {
             final var initialDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern(DATE_FORMAT));
@@ -120,5 +127,11 @@ public class HoraUtil {
         }
     }
 
+    public static String convertTo24HourFormat(String timeString) {
+        String[] timeParts = timeString.split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1].substring(0, 2));
+        hours += 12;
+        return String.format("%02d:%02d", hours, minutes);
+    }
 }
-

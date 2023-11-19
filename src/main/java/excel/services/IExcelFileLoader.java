@@ -2,10 +2,6 @@ package excel.services;
 
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 /**
  * Interface for loading an Excel workbook.
  */
@@ -19,12 +15,4 @@ public interface IExcelFileLoader {
      */
     Workbook loadWorkbook();
 
-    /**
-     * Gets a list of all files within a given folder.
-     *
-     * @param folderPath absolute or relative path of the folder
-     * @return a list with File objects representing each file found within the folder
-     * @throws IllegalArgumentException if the folder path does not exist or is not a directory
-     */
-    List<File> getAllFilesInFolder(String folderPath);
 }
