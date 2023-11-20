@@ -1,7 +1,9 @@
 package util;
 
 import com.google.api.client.util.DateTime;
+import excel.services.impl.ExcelFileLoader;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -133,5 +135,15 @@ public class HoraUtil {
         int minutes = Integer.parseInt(timeParts[1].substring(0, 2));
         hours += 12;
         return String.format("%02d:%02d", hours, minutes);
+    }
+
+    public static Pair<String, String> getTimeSlotBounds() {
+        final var timeSlot = ExcelFileLoader.getFile().split("_")[3];
+
+        final var inicio = timeSlot.split("-")[0];
+
+        final var finalSemana = timeSlot.split("-")[1].split("\\.")[0];
+
+        return new Pair<>(inicio, finalSemana);
     }
 }

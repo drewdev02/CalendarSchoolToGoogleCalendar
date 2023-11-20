@@ -2,7 +2,6 @@ import com.google.api.services.calendar.model.Event;
 import excel.ExcelReaderBuilder;
 import excel.services.IDataExtractor;
 import excel.services.IEventMapper;
-import excel.services.impl.ExcelFileLoader;
 import googlecalendar.GoogleCalendarServiceBuilder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -12,29 +11,33 @@ import util.Names;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@Slf4j
-public class CalendarStart {
+import static util.HoraUtil.generateDateList;
+import static util.HoraUtil.getTimeSlotBounds;
 
-    public static List<String> getAlphabet() {
+@Slf4j
+public class CalendarStart implements Runnable {
+
+    private List<String> getAlphabet() {
         return IntStream.rangeClosed('A', 'Z')
                 .mapToObj(c -> String.valueOf((char) c))
                 .toList();
     }
 
     @SneakyThrows
-    public static List<List<Event>> generateEventDataList(IDataExtractor data, IEventMapper mapper, String startDate, String endDate) {
+    private List<List<Event>> generateEventDataList(IDataExtractor data, IEventMapper mapper, String startDate,
+                                                    String endDate) {
 
-        final var fechas = HoraUtil.generateDateList(startDate, endDate);
+        var fechas = generateDateList(startDate, endDate);
         log.debug("Fechas Generadas");
 
-        final var horas = fechas.stream()
+        var horas = fechas.stream()
                 .map(mapper::getTimeSlots)
                 .toList();
 
-        final var rowNumber = "21";
-        final var colLetter = "D";
+        var rowNumber = "21";
+        var colLetter = "D";
 
-        final var semana = IntStream.range(0, fechas.size())
+        var semana = IntStream.range(0, fechas.size())
                 .mapToObj(i -> {
                     var index = getAlphabet().indexOf(colLetter);
                     return getAlphabet().get(index + i);
@@ -49,33 +52,37 @@ public class CalendarStart {
                 .toList();
     }
 
-    public static void main(String[] args) {
-
+    @Override
+    public void run() {
         // Build a new authorized API client service.
-        final var calendar = new GoogleCalendarServiceBuilder()
+        var calendar = new GoogleCalendarServiceBuilder()
                 .withAuthorizationFlow()
                 .withHttpTransport()
                 .build();
 
-        final var excel = new ExcelReaderBuilder()
+        var excel = new ExcelReaderBuilder()
                 .withExcelFileLoader()
                 .withDataExtractor()
                 .withEventMapper()
                 .build();
 
-        final var timeSlot = ExcelFileLoader.getFile().split("_")[3];
+        var timeSlotBounds = getTimeSlotBounds();
 
-        final var inicio = timeSlot.split("-")[0];
+        var inicio = timeSlotBounds.getFirst();
 
-        final var finalSemana = timeSlot.split("-")[1].split("\\.")[0];
+        var Semana = timeSlotBounds.getSecond();
 
-        final var mapper = excel.getEventMapper();
+        var mapper = excel.getEventMapper();
 
-        final var data = excel.getDataExtractor();
+        var data = excel.getDataExtractor();
 
-        final var semana = generateEventDataList(data, mapper, inicio, finalSemana);
+        var semana = generateEventDataList(data, mapper, inicio, Semana);
 
         semana.forEach(calendar::createEvents);
+        log.info("task completed");
+    }
 
+    public static void main(String[] args) {
+        new CalendarStart().run();
     }
 }
