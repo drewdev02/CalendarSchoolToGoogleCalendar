@@ -16,7 +16,6 @@ public class SecretManager {
     private static final String projectId = "calendar-390122";
     private static final String secretId = "76017159543-np73daebva0nfb6d96o85a0upvgogg63.apps.googleusercontent.com";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    ;
 
     public static GoogleClientSecrets getSecret() throws IOException {
         // Crea un cliente de Secret Manager
