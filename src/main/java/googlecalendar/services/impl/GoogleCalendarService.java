@@ -70,6 +70,7 @@ public class GoogleCalendarService implements CalendarService {
                 }
             }
         });
+        log.info("eventos creados");
     }
 
     @SneakyThrows

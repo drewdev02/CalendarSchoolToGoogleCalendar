@@ -22,7 +22,7 @@ public class CalendarStart {
     }
 
     @SneakyThrows
-    public static List<List<Event>> algo(IDataExtractor data, IEventMapper mapper, String startDate, String endDate) {
+    public static List<List<Event>> generateEventDataList(IDataExtractor data, IEventMapper mapper, String startDate, String endDate) {
 
         final var fechas = HoraUtil.generateDateList(startDate, endDate);
         log.debug("Fechas Generadas");
@@ -63,7 +63,7 @@ public class CalendarStart {
                 .withEventMapper()
                 .build();
 
-        final var timeSlot = ExcelFileLoader.DATA_FILE_PATH.split("_")[3];
+        final var timeSlot = ExcelFileLoader.getFile().split("_")[3];
 
         final var inicio = timeSlot.split("-")[0];
 
@@ -73,10 +73,9 @@ public class CalendarStart {
 
         final var data = excel.getDataExtractor();
 
-        final var semana = algo(data, mapper, inicio, finalSemana);
+        final var semana = generateEventDataList(data, mapper, inicio, finalSemana);
 
-        //semana.forEach(calendar::createEvents);
-        log.info("eventos creados");
+        semana.forEach(calendar::createEvents);
 
     }
 }
