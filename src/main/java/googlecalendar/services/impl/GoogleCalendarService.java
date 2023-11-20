@@ -9,6 +9,7 @@ import googlecalendar.services.CalendarService;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import model.Schedule;
 import org.jetbrains.annotations.NotNull;
 import util.Attendee;
 
@@ -100,6 +101,14 @@ public class GoogleCalendarService implements CalendarService {
                     })
                     .toList();
         }
+    }
+
+    @Override
+    public void createEvents(Schedule schedule) {
+        schedule.getClassSchedules()
+                .stream()
+                .map(model.ClassSchedule::getEvents)
+                .forEach(this::createEvents);
     }
 
 }

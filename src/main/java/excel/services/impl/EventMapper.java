@@ -102,6 +102,7 @@ public class EventMapper implements IEventMapper {
                         .timeSlot(horas.get(i))
                         .location(listLocation.get(i))
                         .build())
+                .filter(e -> e.getName() != null && !e.getName().equals("null"))
                 .toList();
     }
 

@@ -10,13 +10,6 @@ import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class ClassSchedule {
-    private String day;
     private List<Event> events;
-
-    public void addEvent(Event event) {
-        this.events.add(event);
-    }
 }

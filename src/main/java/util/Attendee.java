@@ -8,7 +8,8 @@ import java.util.Set;
 public class Attendee {
     private static final Set<String> attendees = Set.of(
             "javierc.ps16@gmail.com",
-            "eismerlobaina@gmail.com"
+            "eismerlobaina@gmail.com",
+            "voidtracer6@gmail.com"
     );
 
     private Attendee() {

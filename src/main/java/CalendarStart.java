@@ -1,11 +1,11 @@
-import com.google.api.services.calendar.model.Event;
 import excel.ExcelReaderBuilder;
 import excel.services.IDataExtractor;
 import excel.services.IEventMapper;
 import googlecalendar.GoogleCalendarServiceBuilder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import util.HoraUtil;
+import model.ClassSchedule;
+import model.Schedule;
 import util.Names;
 
 import java.util.List;
@@ -24,8 +24,8 @@ public class CalendarStart implements Runnable {
     }
 
     @SneakyThrows
-    private List<List<Event>> generateEventDataList(IDataExtractor data, IEventMapper mapper, String startDate,
-                                                    String endDate) {
+    private List<ClassSchedule> generateClassSchedules(IDataExtractor data, IEventMapper mapper, String startDate,
+                                                       String endDate) {
 
         var fechas = generateDateList(startDate, endDate);
         log.debug("Fechas Generadas");
@@ -49,6 +49,7 @@ public class CalendarStart implements Runnable {
         return IntStream.range(0, semana.size())
                 .mapToObj(i -> mapper.mapToListOfSubjects(semana.get(i), horas.get(i)))
                 .map(mapper::mapToEventDataList)
+                .map(lista -> ClassSchedule.builder().events(lista).build())
                 .toList();
     }
 
@@ -76,9 +77,12 @@ public class CalendarStart implements Runnable {
 
         var data = excel.getDataExtractor();
 
-        var semana = generateEventDataList(data, mapper, inicio, Semana);
+        var classSchedules = generateClassSchedules(data, mapper, inicio, Semana);
 
-        semana.forEach(calendar::createEvents);
+        var schedule = Schedule.builder()
+                .classSchedules(classSchedules)
+                .build();
+        calendar.createEvents(schedule);
         log.info("task completed");
     }
 
